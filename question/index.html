@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Lobby</title>
+
+	<style>
+		body {
+			margin: 0;
+			background: #141415;
+		}
+		#page {
+			height: 100vh;
+			width: auto;
+			
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+
+		input {
+			font-family: Arial;
+			font-size: 1.2vh;
+			color: #000;
+
+			position: absolute;
+			border: 2px solid red;
+
+			box-sizing: border-box;
+			background: transparent;
+
+			z-index: 100;
+		}
+		input:focus {
+			outline: none;
+		}
+
+		button {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background: #fff;
+			color: #000;
+			border: 2px solid #000;
+			font-family: monospace;
+			cursor: pointer;
+
+			width: 70px;
+			height: 70px;
+
+			font-size: 15px;
+			border-bottom-left-radius: 10px;
+			z-index: 100;
+		}
+	</style>
+</head>
+<body>
+	<button id="next" onclick="answer()">NEXT</button>
+	<canvas id="page"></canvas>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js'></script>
+	<script>
+		// const user = sessionStorage.getItem('session');
+		// const room = sessionStorage.getItem('room');
+
+		const user = 'qwk';
+		const room = 'test';
+		
+		if (!user || !room) {
+			alert('Session expired.');
+			window.location.href = '/';
+		}
+		function main(url, pageNum, boxes) {
+			const canvas = document.getElementById('page');
+
+			pdfjsLib.getDocument(url).promise.then(pdf => {
+				pdf.getPage(pageNum).then(page => {
+					const viewport = page.getViewport({ scale: 1.5 });
+					canvas.height = viewport.height;
+					canvas.width = viewport.width;
+
+					const renderContext = {
+						canvasContext: canvas.getContext('2d'),
+						viewport: viewport
+					};
+
+					page.render(renderContext).promise;
+
+					boxes.forEach(bounds => {
+						const cw = canvas.clientWidth;
+						const ch = canvas.clientHeight;
+						const cb = canvas.getBoundingClientRect();
+
+						const x = cb.left + (bounds[0] * cw);
+						const y = cb.top + (bounds[1] * ch);
+						const w = (bounds[2] - bounds[0]) * cw;
+						const h = (bounds[3] - bounds[1]) * ch;
+
+						const box = document.createElement('input');
+						box.type = 'text';
+						box.style.cssText = `width: ${w}px; height: ${h}px; left: ${x}px; top: ${y}px;`;
+						document.body.prepend(box);
+					})
+				});
+			});
+		}
+
+		fetch(`https://rlx.pythonanywhere.com/livepaper/api/question?id=${room}&user=${user}`, { method: 'GET' })
+			.then(response => response.json())
+			.then(data => {
+				main(data['url'], data['page'], data['input']);
+			})
+			.catch(error => {
+				console.error('Error:', error)
+			});
+
+		function answer() {
+			const inputs = document.querySelectorAll('input[type="text"]');
+			const answers = Array.from(inputs).map(input => input.value);
+
+			fetch(`https://rlx.pythonanywhere.com/livepaper/api/answer?id=${room}&user=${user}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ answers })
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data['success'] == true) {
+					if (data['done'] == true) {
+						alert('Paper finished!');
+						window.location.href = '/';
+					} else {
+						window.location.refresh();
+					}
+					
+				} else {
+					alert('Error submitting answers. Please try again.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+		}
+	</script>
+</body>
+</html>

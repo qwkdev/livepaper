@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Create</title>
+		<style>
+			body {
+				margin: 0;
+				background: #000;
+			}
+			#page {
+				height: 100vh;
+				width: auto;
+				
+				position: absolute;
+				top: 0;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			button {
+				position: absolute;
+				top: 0;
+				background: #fff;
+				color: #000;
+				border: 1px solid #000;
+				font-family: monospace;
+				cursor: pointer;
+
+				width: 50px;
+				height: 50px;
+			}
+
+			#temp, #box {
+				position: absolute;
+				z-index: 100;
+				border: 2px solid red;
+				background: #ff000077;
+			}
+			#temp {
+				width: 5px;
+				height: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="page"></canvas>
+		<div id="temp" style="display: none;"></div>
+		<div id="box" style="display: none;"></div>
+		<button id="pbtn" style="left: 0;"><<</button>
+		<button id="nbtn" style="right: 0;">>></button>
+
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js'></script>
+		<script>
+			const url = 'https://nat5.sqa.my/computing/2024/N5_Computing_2024_Paper.pdf'; //prompt("Enter full URL:");
+			const canvas = document.getElementById('page');
+			const prevBtn = document.getElementById('pbtn');
+			const nextBtn = document.getElementById('nbtn');
+
+			let pdfDoc = null;
+			let currentPage = 1;
+			let totalPages = 0;
+			let isRendering = false;
+			let pendingPage = null;
+
+			function renderPage(num) {
+				isRendering = true;
+
+				pdfDoc.getPage(num).then(page => {
+					const viewport = page.getViewport({ scale: 1.5 });
+					canvas.height = viewport.height;
+					canvas.width = viewport.width;
+
+					const renderContext = {
+						canvasContext: canvas.getContext('2d'),
+						viewport: viewport
+					};
+
+					return page.render(renderContext).promise;
+				}).then(() => {
+					isRendering = false;
+					if (pendingPage !== null) {
+						renderPage(pendingPage);
+						pendingPage = null;
+					}
+				});
+			}
+
+			function queueRenderPage(num) {
+				if (isRendering) {
+					pendingPage = num;
+				} else {
+					renderPage(num);
+				}
+			}
+
+			function round(num, n) {
+				const factor = Math.pow(10, n);
+				return Math.round(num * factor) / factor;
+			}
+
+			prevBtn.addEventListener('click', () => {
+				document.getElementById('temp').style.cssText = 'display: none;';
+				document.getElementById('box').style.cssText = 'display: none;';
+
+				if (currentPage <= 1) return;
+				currentPage--;
+				queueRenderPage(currentPage);
+			});
+
+			nextBtn.addEventListener('click', () => {
+				document.getElementById('temp').style.cssText = 'display: none;';
+				document.getElementById('box').style.cssText = 'display: none;';
+
+				if (currentPage >= totalPages) return;
+				currentPage++;
+				queueRenderPage(currentPage);
+			});
+
+			const places = 4;
+			let coords = null;
+			canvas.addEventListener('click', e => {
+				const cw = canvas.clientWidth;
+				const ch = canvas.clientHeight;
+				const x = Math.round(e.clientX - canvas.getBoundingClientRect().left);
+				const y = Math.round(e.clientY - canvas.getBoundingClientRect().top);
+
+				const temp = document.getElementById('temp');
+				const box = document.getElementById('box');
+
+				if (temp.style.display == 'none') {
+					box.style.cssText = 'display: none';
+					temp.style.cssText = `left: ${e.clientX}px; top: ${e.clientY}px;`;
+					coords = [e.clientX, e.clientY, x, y];
+				} else {
+					temp.style.display = 'none';
+					box.style.cssText = `left: ${coords[0]}px; top: ${coords[1]}px; width: ${e.clientX - coords[0]}px; height: ${e.clientY - coords[1]}px;`;
+					
+					console.log(JSON.stringify([currentPage - 1, round(coords[2]/cw, places), round(coords[3]/ch, places), round(x/cw, places), round(y/ch, places)]));
+				}
+			});
+
+			pdfjsLib.getDocument(url).promise.then(pdf => {
+				pdfDoc = pdf;
+				totalPages = pdf.numPages;
+				renderPage(currentPage);
+			});
+		</script>
+	</body>
+</html>

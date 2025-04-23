@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Join Room</title>
+
+	<style>
+		body {
+			margin: 0;
+			background: #141415;
+		}
+		input {
+			width: 80vw;
+			padding: 0 0 .3vw 3vw;
+		}
+		input:focus {
+			outline: none;
+		}
+		button {
+			width: 50vw;
+			font-size: 4vw;
+		}
+		input, button {
+			background: rgba(245, 245, 255, 0.075);
+			border: .5vw solid rgba(255, 255, 255, 0.15);
+			border-radius: 2vw;
+			backdrop-filter: blur(5px);
+			color: white;
+			position: absolute;
+			height: 10vw;
+			left: 50%;
+			font-size: 4vw;
+			box-sizing: border-box;
+			transform: translate(-50%, -50%);
+		}
+		#name { top: calc(50% - 12vw); }
+		#roomId { top: 50%; }
+		button { top: calc(50% + 12vw); }
+
+		@media only screen and (min-width: 100vh) {
+			input {
+				width: 80vh;
+				padding: 0 0 .3vh 3vh;
+			}
+			button {
+				width: 50vh;
+				font-size: 4vh;
+			}
+			input, button {
+				border-width: .5vh;
+				border-radius: 2vh;
+				height: 10vh;
+				font-size: 4vh;
+			}
+			#name { top: calc(50% - 12vh); }
+			button { top: calc(50% + 12vh); }
+		}
+	</style>
+</head>
+<body>
+	<input type="text" id="name" placeholder="Name" required>
+	<input type="text" id="roomId" placeholder="Enter Code" required>
+	<button onclick="join()">Join</button>
+
+	<script>
+		function join() {
+			const roomId = encodeURIComponent(document.getElementById('roomId').value);
+			const user = encodeURIComponent(document.getElementById('roomId').value);
+			if (roomId && user) {
+				fetch(`https://rlx.pythonanywhere.com/livepaper/init?id=${roomId}&name=${user}`, { method: 'GET' })
+					.then(response => response.json())
+					.then(data => {
+						sessionStorage.setItem('room', roomId);
+						sessionStorage.setItem('session', data['session']);
+						window.location.href = `/lobby`;
+					})
+					.catch(error => {
+						console.error('Error:', error)
+					});
+			} else {
+				alert('Please enter a valid room code or username.');
+			}
+		}
+	</script>
+</body>
+</html>
