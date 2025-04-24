@@ -100,7 +100,7 @@
 			}
 
 			prevBtn.addEventListener('click', () => {
-				alert(JSON.stringify({currentPage - 1: boxes}));
+				alert(JSON.stringify({[`${currentPage - 1}`]: boxes}));
 				boxes = [];
 				
 				document.getElementById('temp').style.cssText = 'display: none;';
@@ -112,7 +112,7 @@
 			});
 
 			nextBtn.addEventListener('click', () => {
-				alert(JSON.stringify({currentPage - 1: boxes}));
+				alert(JSON.stringify({[`${currentPage - 1}`]: boxes}));
 				boxes = [];
 				
 				document.getElementById('temp').style.cssText = 'display: none;';
