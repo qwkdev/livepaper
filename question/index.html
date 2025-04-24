@@ -20,7 +20,8 @@
 			transform: translateX(-50%);
 		}
 
-		input {
+		textarea {
+			resize: none;
 			font-family: Arial;
 			font-size: 1.2vh;
 			color: #000;
@@ -33,7 +34,7 @@
 
 			z-index: 100;
 		}
-		input:focus {
+		textarea:focus {
 			outline: none;
 		}
 
@@ -94,8 +95,7 @@
 						const w = (bounds[2] - bounds[0]) * cw;
 						const h = (bounds[3] - bounds[1]) * ch;
 
-						const box = document.createElement('input');
-						box.type = 'text';
+						const box = document.createElement('textarea');
 						box.style.cssText = `width: ${w}px; height: ${h}px; left: ${x}px; top: ${y}px;`;
 						document.body.prepend(box);
 					})
@@ -113,7 +113,7 @@
 			});
 
 		function answer() {
-			const inputs = document.querySelectorAll('input[type="text"]');
+			const inputs = document.querySelectorAll('textarea');
 			const answers = Array.from(inputs).map(input => input.value);
 
 			fetch(`https://rlx.pythonanywhere.com/livepaper/api/answer?id=${room}&user=${user}`, {
