@@ -61,12 +61,9 @@
 	<canvas id="page"></canvas>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js'></script>
 	<script>
-		// const user = sessionStorage.getItem('session');
-		// const room = sessionStorage.getItem('room');
+		const user = sessionStorage.getItem('session');
+		const room = sessionStorage.getItem('room');
 
-		const user = 'qwk';
-		const room = 'test';
-		
 		if (!user || !room) {
 			alert('Session expired.');
 			window.location.href = '/';
