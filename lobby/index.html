@@ -36,7 +36,7 @@
 			fetch(`https://rlx.pythonanywhere.com/livepaper/api/user?id=${room}&user=${user}`, { method: 'GET' })
 				.then(response => response.json())
 				.then(data => {
-					if (data['question'] != 0) {
+					if (data['page'] != 0) {
 						window.location.href = `/question`;
 					}
 				})
