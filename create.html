@@ -100,6 +100,9 @@
 			}
 
 			prevBtn.addEventListener('click', () => {
+				alert(JSON.stringify({currentPage - 1: boxes}));
+				boxes = [];
+				
 				document.getElementById('temp').style.cssText = 'display: none;';
 				document.getElementById('box').style.cssText = 'display: none;';
 
@@ -109,6 +112,9 @@
 			});
 
 			nextBtn.addEventListener('click', () => {
+				alert(JSON.stringify({currentPage - 1: boxes}));
+				boxes = [];
+				
 				document.getElementById('temp').style.cssText = 'display: none;';
 				document.getElementById('box').style.cssText = 'display: none;';
 
@@ -119,6 +125,8 @@
 
 			const places = 4;
 			let coords = null;
+
+			let boxes = []
 			canvas.addEventListener('click', e => {
 				const cw = canvas.clientWidth;
 				const ch = canvas.clientHeight;
@@ -136,7 +144,7 @@
 					temp.style.display = 'none';
 					box.style.cssText = `left: ${coords[0]}px; top: ${coords[1]}px; width: ${e.clientX - coords[0]}px; height: ${e.clientY - coords[1]}px;`;
 					
-					alert(JSON.stringify({currentPage - 1: [round(coords[2]/cw, places), round(coords[3]/ch, places), round(x/cw, places), round(y/ch, places)]}));
+					boxes.push([round(coords[2]/cw, places), round(coords[3]/ch, places), round(x/cw, places), round(y/ch, places)]);
 				}
 			});
 
