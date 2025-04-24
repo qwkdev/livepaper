@@ -66,7 +66,7 @@
 	<script>
 		function join() {
 			const roomId = encodeURIComponent(document.getElementById('roomId').value);
-			const user = encodeURIComponent(document.getElementById('roomId').value);
+			const user = encodeURIComponent(document.getElementById('name').value);
 			if (roomId && user) {
 				fetch(`https://rlx.pythonanywhere.com/livepaper/init?id=${roomId}&name=${user}`, { method: 'GET' })
 					.then(response => response.json())
