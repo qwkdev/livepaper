@@ -136,7 +136,7 @@
 					temp.style.display = 'none';
 					box.style.cssText = `left: ${coords[0]}px; top: ${coords[1]}px; width: ${e.clientX - coords[0]}px; height: ${e.clientY - coords[1]}px;`;
 					
-					console.log(JSON.stringify([currentPage - 1, round(coords[2]/cw, places), round(coords[3]/ch, places), round(x/cw, places), round(y/ch, places)]));
+					console.log(currentPage - 1, JSON.stringify([round(coords[2]/cw, places), round(coords[3]/ch, places), round(x/cw, places), round(y/ch, places)]));
 				}
 			});
 
